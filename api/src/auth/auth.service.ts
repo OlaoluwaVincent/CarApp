@@ -1,10 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { jwtSecret } from 'src/constants';
 import { JwtService } from '@nestjs/jwt';
 import { LoginType } from './dto/authType';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -16,24 +22,57 @@ export class AuthService {
   public userDB = this.prismaDb.user;
 
   async create(createAuthDto: CreateAuthDto) {
-    const data = await this.userDB.create({
-      data: { ...createAuthDto, hashedPassword: '12345dfd' },
+    const isExisting = await this.userDB.findUnique({
+      where: { email: createAuthDto.email },
     });
 
+    if (isExisting) {
+      throw new ConflictException('User with this email already exists.');
+    }
+    //gen salt for hashing
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(createAuthDto.password, salt);
+
+    // upload the hashedPassword
+    const data = await this.userDB.create({
+      data: {
+        email: createAuthDto.email,
+        name: createAuthDto.name,
+        hashedPassword,
+      },
+    });
+
+    if (!data) {
+      throw new BadRequestException(
+        'Invalid data provided for account creation.',
+      );
+    }
+
+    //Sign token for the new user
     const token = await this.signToken({
       id: data.id,
       email: data.email,
     });
 
-    return { data, token };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedPassword: password, ...userData } = data;
+
+    return { data: userData, token };
   }
 
   async login(data: LoginType) {
     const user = await this.userDB.findUnique({ where: { email: data.email } });
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid Email or password');
     }
-    // const isValid = await user.hashedPassword.compare(data.password);
+
+    const isMatch = await bcrypt.compare(data.password, user.hashedPassword);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid email or password.');
+    }
+
+    const token = await this.signToken({ id: user.id, email: user.email });
+    return { data: { name: user.name, email: user.email, id: user.id }, token };
   }
 
   // Helper Func
