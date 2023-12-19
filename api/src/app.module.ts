@@ -4,9 +4,20 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { UserModule } from './user/user.module';
+import { CarModule } from './car/car.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { storage } from './multer.config';
 
 @Module({
-  imports: [AuthModule, PrismaModule, UserModule],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    UserModule,
+    CarModule,
+    MulterModule.register({
+      storage,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
