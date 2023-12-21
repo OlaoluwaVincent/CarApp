@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   HttpStatus,
+  Param,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -49,6 +50,17 @@ export class CarController {
     }
   }
 
+  @Get(':id')
+  async findOne(@Res() res: Response, @Param('id') id: string) {
+    return this.carService.findOne(res, id);
+  }
+
+  @Post('hire/:id')
+  async hire(@Res() res: Response, @Param('id') id: string) {
+    return 'this is the route for hiring a car./' + id;
+  }
+
+  // This is to upload multiple images
   // private async uploadImages(images: Array<Express.Multer.File>) {
   //   try {
   //     if (images) {

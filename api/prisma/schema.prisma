@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,22 +14,22 @@ enum UserRole {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
+  id             String      @id @default(uuid())
+  email          String      @unique
   name           String
-  role           UserRole @default(CUSTOMER)
+  role           UserRole    @default(CUSTOMER)
   hashedPassword String
+  rentedCars     RentedCar[]
 }
 
 model CarImage {
-  id      String @id @default(uuid())
-  images  String[]
-  carId   String @unique
-  car     Car    @relation(fields: [carId], references: [id])
+  id     String   @id @default(uuid())
+  images String[]
+  car    Car?
 }
 
 model Car {
-  id             String    @id @default(uuid())
+  id             String      @id @default(uuid())
   name           String
   carType        String
   steering       String
@@ -38,7 +37,24 @@ model Car {
   gasoline       String
   amount         String
   description    String
+  rented         Boolean     @default(false)
   tag            String?
   tagDescription String?
-  carImage       CarImage?
+  
+  carImage       CarImage   @relation(fields: [carImageId], references: [id]) // a car must have an image
+  carImageId     String     @unique
+  
+  RentedCar      RentedCar?  @relation(fields: [rentedCarId], references: [id])
+  rentedCarId    String?      @unique  // a car should be rented once
+}
+
+model RentedCar {
+  id     String @id @default(uuid())
+  pickupDate  DateTime
+  returnDate  DateTime
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+  
+  car    Car?   
 }

@@ -15,7 +15,6 @@ import { Prisma } from '@prisma/client';
 export class CarService {
   constructor(private prismaDB: PrismaService) {}
   public carDb = this.prismaDB.car;
-  public carImage = this.prismaDB.carImage;
 
   async create(
     createCarDto: CreateCarDto,
@@ -66,7 +65,7 @@ export class CarService {
       const pageNumber = !page ? 1 : page;
       const skip = (pageNumber - 1) * perPage;
 
-      const [allCar, totalCount] = await Promise.all([
+      const [allCars, totalCount] = await Promise.all([
         this.carDb.findMany({
           include: {
             carImage: {
@@ -88,8 +87,8 @@ export class CarService {
       const totalPages = Math.ceil(totalCount / perPage);
 
       return res.status(HttpStatus.OK).json({
-        data: allCar,
-        length: allCar.length,
+        data: allCars,
+        length: allCars.length,
         totalCount,
         totalPages,
       });
@@ -97,6 +96,21 @@ export class CarService {
       console.error(error);
       throw new InternalServerErrorException('Internal Server Error');
     }
+  }
+
+  async findOne(res: Response, id: string) {
+    const car = await this.carDb.findUnique({
+      where: { id: id },
+      include: {
+        carImage: {
+          select: {
+            images: true,
+          },
+        },
+      },
+    });
+
+    return res.status(HttpStatus.OK).json({ data: car });
   }
 
   private async uploadImage(image: Express.Multer.File) {
