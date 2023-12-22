@@ -45,7 +45,7 @@ CREATE TABLE "RentedCar" (
     "id" TEXT NOT NULL,
     "paymentStatus" BOOLEAN NOT NULL DEFAULT false,
     "userId" TEXT NOT NULL,
-    "rentedCarId" TEXT,
+    "rentedCarId" TEXT NOT NULL,
     "rentalDetailId" TEXT NOT NULL,
 
     CONSTRAINT "RentedCar_pkey" PRIMARY KEY ("id")
@@ -97,7 +97,7 @@ ALTER TABLE "Car" ADD CONSTRAINT "Car_carImageId_fkey" FOREIGN KEY ("carImageId"
 ALTER TABLE "RentedCar" ADD CONSTRAINT "RentedCar_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "RentedCar" ADD CONSTRAINT "RentedCar_rentedCarId_fkey" FOREIGN KEY ("rentedCarId") REFERENCES "Car"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "RentedCar" ADD CONSTRAINT "RentedCar_rentedCarId_fkey" FOREIGN KEY ("rentedCarId") REFERENCES "Car"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "RentedCar" ADD CONSTRAINT "RentedCar_rentalDetailId_fkey" FOREIGN KEY ("rentalDetailId") REFERENCES "RentedCarDetails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

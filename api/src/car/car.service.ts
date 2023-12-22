@@ -8,10 +8,10 @@ import {
 import { CreateCarDto } from './dto/create-car.dto';
 import { cloud_name, api_key, api_secret } from 'src/constants';
 import { v2 as cloudinary } from 'cloudinary';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { HireDto } from 'src/auth/dto/car-hire-dto';
+import { HireDto } from './dto/car-hire-dto';
 
 @Injectable()
 export class CarService {
@@ -116,8 +116,10 @@ export class CarService {
     return res.status(HttpStatus.OK).json({ data: car });
   }
 
-  async hireCar(res: Response, id: string, hireDto: HireDto) {
+  async hireCar(req: Request, res: Response, id: string, hireDto: HireDto) {
     const car_to_hire = await this.carDb.findUnique({ where: { id: id } });
+    const { userId } = req.user;
+
     if (!car_to_hire) {
       throw new NotFoundException('Car does not exist');
     }
@@ -126,12 +128,11 @@ export class CarService {
       data: {
         paymentStatus: true,
         user: {
-          connect: { id: id },
-        }, // Replace userId with the actual user ID
+          connect: { id: userId },
+        },
         RentedCar: {
           connect: { id: id },
-        }, // Replace userId with the actual user ID
-        rentedCarId: car_to_hire.id, // Replace car_to_hire.id with the actual car ID
+        },
         rentDetail: {
           create: {
             billingAddress: { ...hireDto.billingAddress },
@@ -148,9 +149,11 @@ export class CarService {
       },
     });
 
-    console.log('RentedCar created:', rentedCar);
+    if (!rentedCar) {
+      throw new BadRequestException('Failed to create an hire');
+    }
 
-    res.send('route for hire');
+    res.status(HttpStatus.OK).json({ data: rentedCar });
   }
   private async uploadImage(image: Express.Multer.File) {
     cloudinary.config({

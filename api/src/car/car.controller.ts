@@ -10,14 +10,15 @@ import {
   Query,
   HttpStatus,
   Param,
+  Req,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { storage } from 'src/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { HireDto } from 'src/auth/dto/car-hire-dto';
+import { HireDto } from './dto/car-hire-dto';
 // import { v2 as cloudinary } from 'cloudinary';
 
 @Controller('car')
@@ -59,11 +60,12 @@ export class CarController {
   @UseGuards(JwtAuthGuard)
   @Post('hire/:id')
   async hire(
+    @Req() req: Request,
     @Res() res: Response,
     @Param('id') id: string,
     @Body() hireDto: HireDto,
   ) {
-    return this.carService.hireCar(res, id, hireDto);
+    return this.carService.hireCar(req, res, id, hireDto);
   }
 
   // This is to upload multiple images

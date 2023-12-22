@@ -52,6 +52,7 @@ export class AuthService {
     const token = await this.signToken({
       id: data.id,
       email: data.email,
+      role: data.role,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -71,12 +72,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
-    const token = await this.signToken({ id: user.id, email: user.email });
-    return { data: { name: user.name, email: user.email, id: user.id }, token };
+    const token = await this.signToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hashedPassword, ...userDetails } = user;
+    return { data: { ...userDetails }, token };
   }
 
   // Helper Func
-  async signToken(args: { id: string; email: string }) {
+  async signToken(args: { id: string; email: string; role: string }) {
     const payload = args;
     return this.jwt.signAsync(payload, {
       secret: jwtSecret,

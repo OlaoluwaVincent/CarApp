@@ -1,19 +1,6 @@
 /* eslint-disable prettier/prettier */
+import { ApiProperty } from '@nestjs/swagger';
 import { IsObject, IsString } from 'class-validator';
-
-export class HireDto {
-  @IsObject()
-  pickupInfo: RentalInfoDto;
-
-  @IsObject()
-  dropOffInfo: RentalInfoDto;
-
-  @IsObject()
-  billingAddress: BillingInfoDto;
-
-  @IsObject()
-  paymentInfo: PaymentInfoDto;
-}
 
 export class BillingInfoDto {
   @IsString()
@@ -49,4 +36,22 @@ export class PaymentInfoDto {
   expiryDate: string;
   @IsString()
   cvv: string;
+}
+
+export class HireDto {
+  @ApiProperty({
+    example: 'Maine Coon',
+    description: 'The breed of the Cat',
+  })
+  @IsObject()
+  pickupInfo: RentalInfoDto;
+
+  @IsObject()
+  dropOffInfo: RentalInfoDto;
+
+  @IsObject()
+  billingAddress: BillingInfoDto;
+
+  @IsObject()
+  paymentInfo: PaymentInfoDto;
 }
