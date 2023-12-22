@@ -17,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { storage } from 'src/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { HireDto } from 'src/auth/dto/car-hire-dto';
 // import { v2 as cloudinary } from 'cloudinary';
 
 @Controller('car')
@@ -24,7 +25,7 @@ export class CarController {
   constructor(private readonly carService: CarService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('create')
   @UseInterceptors(FileInterceptor('images', { storage }))
   async create(
     @Body() createCarDto: CreateCarDto,
@@ -55,9 +56,14 @@ export class CarController {
     return this.carService.findOne(res, id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('hire/:id')
-  async hire(@Res() res: Response, @Param('id') id: string) {
-    return 'this is the route for hiring a car./' + id;
+  async hire(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() hireDto: HireDto,
+  ) {
+    return this.carService.hireCar(res, id, hireDto);
   }
 
   // This is to upload multiple images

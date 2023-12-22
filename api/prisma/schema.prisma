@@ -40,21 +40,48 @@ model Car {
   rented         Boolean     @default(false)
   tag            String?
   tagDescription String?
+  region         String
+  state          String
   
   carImage       CarImage   @relation(fields: [carImageId], references: [id]) // a car must have an image
   carImageId     String     @unique
   
-  RentedCar      RentedCar?  @relation(fields: [rentedCarId], references: [id])
-  rentedCarId    String?      @unique  // a car should be rented once
+
+  car    RentedCar?
+
 }
 
+
 model RentedCar {
-  id     String @id @default(uuid())
-  pickupDate  DateTime
-  returnDate  DateTime
+  id              String @id @default(uuid())
+  paymentStatus   Boolean @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique
   
-  car    Car?   
+  RentedCar      Car  @relation(fields: [rentedCarId], references: [id])
+  rentedCarId    String     @unique  // a car should be rented once
+
+  rentDetail      RentedCarDetails @relation(fields: [rentalDetailId], references: [id])
+  rentalDetailId  String @unique  
+}
+
+model RentedCarDetails {
+  id              String @id @default(uuid())
+  RentedCar       RentedCar?
+
+  pickupInfo      Json
+  dropOffInfo     Json
+  billingAddress  Json
+  paymentInfo     Json
+}
+
+model Profile {
+  id                String @id @default(uuid())
+  name              String
+  cardName          String
+  cardType          String
+  cardNumber        Int
+  expirationMonth   Int
+  expirationYear    Int
 }

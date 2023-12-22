@@ -29,4 +29,10 @@ export class CreateCarDto {
   @IsString()
   @IsOptional()
   tagDescription: string;
+
+  @IsString()
+  state: string;
+
+  @IsString()
+  region: string;
 }

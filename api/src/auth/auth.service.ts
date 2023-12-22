@@ -63,7 +63,7 @@ export class AuthService {
   async login(data: LoginType) {
     const user = await this.userDB.findUnique({ where: { email: data.email } });
     if (!user) {
-      throw new UnauthorizedException('Invalid Email or password');
+      throw new UnauthorizedException('Invalid email or password.');
     }
 
     const isMatch = await bcrypt.compare(data.password, user.hashedPassword);

@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { cloud_name, api_key, api_secret } from 'src/constants';
@@ -10,11 +11,13 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { HireDto } from 'src/auth/dto/car-hire-dto';
 
 @Injectable()
 export class CarService {
   constructor(private prismaDB: PrismaService) {}
   public carDb = this.prismaDB.car;
+  public rentalDb = this.prismaDB.rentedCar;
 
   async create(
     createCarDto: CreateCarDto,
@@ -113,6 +116,42 @@ export class CarService {
     return res.status(HttpStatus.OK).json({ data: car });
   }
 
+  async hireCar(res: Response, id: string, hireDto: HireDto) {
+    const car_to_hire = await this.carDb.findUnique({ where: { id: id } });
+    if (!car_to_hire) {
+      throw new NotFoundException('Car does not exist');
+    }
+
+    const rentedCar = await this.rentalDb.create({
+      data: {
+        paymentStatus: true,
+        user: {
+          connect: { id: id },
+        }, // Replace userId with the actual user ID
+        RentedCar: {
+          connect: { id: id },
+        }, // Replace userId with the actual user ID
+        rentedCarId: car_to_hire.id, // Replace car_to_hire.id with the actual car ID
+        rentDetail: {
+          create: {
+            billingAddress: { ...hireDto.billingAddress },
+            dropOffInfo: { ...hireDto.dropOffInfo },
+            pickupInfo: { ...hireDto.pickupInfo },
+            paymentInfo: { ...hireDto.paymentInfo },
+          },
+        },
+      },
+      include: {
+        rentDetail: true,
+        user: true,
+        RentedCar: true,
+      },
+    });
+
+    console.log('RentedCar created:', rentedCar);
+
+    res.send('route for hire');
+  }
   private async uploadImage(image: Express.Multer.File) {
     cloudinary.config({
       cloud_name: cloud_name,
