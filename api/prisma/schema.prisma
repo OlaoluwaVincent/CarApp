@@ -19,8 +19,12 @@ model User {
   name           String
   role           UserRole    @default(CUSTOMER)
   hashedPassword String
+  address        String      @default("")
+  profileImg     String      @default("")
+  state          String      @default("")
+  region         String      @default("")
   rentedCars     RentedCar[]
-}
+  }
 
 model CarImage {
   id     String   @id @default(uuid())
@@ -57,7 +61,7 @@ model RentedCar {
   paymentStatus   Boolean @default(false)
   isReturned   Boolean @default(false)
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
   
   RentedCar      Car  @relation(fields: [rentedCarId], references: [id])
@@ -75,14 +79,4 @@ model RentedCarDetails {
   dropOffInfo     Json
   billingAddress  Json
   paymentInfo     Json
-}
-
-model Profile {
-  id                String @id @default(uuid())
-  name              String
-  cardName          String
-  cardType          String
-  cardNumber        Int
-  expirationMonth   Int
-  expirationYear    Int
 }

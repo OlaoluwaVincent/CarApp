@@ -17,7 +17,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { storage } from 'src/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-// import { v2 as cloudinary } from 'cloudinary';
 
 @Controller('car')
 export class CarController {
@@ -54,23 +53,4 @@ export class CarController {
   async findOne(@Res() res: Response, @Param('id') id: string) {
     return this.carService.findOne(res, id);
   }
-
-  // This is to upload multiple images
-  // private async uploadImages(images: Array<Express.Multer.File>) {
-  //   try {
-  //     if (images) {
-  //       const uploadedImages = await Promise.all(
-  //         images.map((file) => cloudinary.uploader.upload(file.path)),
-  //       );
-  //       const secureUrls = uploadedImages.map((image) => image.secure_url);
-  //       // Return the secure URLs in the response
-  //       return secureUrls;
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading image to Cloudinary:', error);
-  //     throw new Error('Failed to upload image');
-  //   }
-  // }
 }

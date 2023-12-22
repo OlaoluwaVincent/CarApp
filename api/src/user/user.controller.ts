@@ -1,45 +1,51 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
   UseGuards,
+  Res,
+  UseInterceptors,
+  UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Request, Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storage } from 'src/multer.config';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Req() req: Request, @Res() res: Response) {
+    return this.userService.findAll(req, res);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  findOne(@Res() res: Response, @Param('id') id: string) {
+    return this.userService.findOne(res, id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Patch('update/:id')
+  @UseInterceptors(FileInterceptor('profileImage', { storage }))
+  update(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return this.userService.updateProfile(res, id, updateUserDto, image);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
+    return this.userService.remove(req, res, id);
   }
 }
