@@ -55,9 +55,10 @@ model Car {
 model RentedCar {
   id              String @id @default(uuid())
   paymentStatus   Boolean @default(false)
+  isReturned   Boolean @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
+  userId String
   
   RentedCar      Car  @relation(fields: [rentedCarId], references: [id])
   rentedCarId    String     @unique  // a car should be rented once

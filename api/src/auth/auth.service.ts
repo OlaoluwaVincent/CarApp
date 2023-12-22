@@ -50,7 +50,7 @@ export class AuthService {
 
     //Sign token for the new user
     const token = await this.signToken({
-      id: data.id,
+      userId: data.id,
       email: data.email,
       role: data.role,
     });
@@ -73,7 +73,7 @@ export class AuthService {
     }
 
     const token = await this.signToken({
-      id: user.id,
+      userId: user.id,
       email: user.email,
       role: user.role,
     });
@@ -84,7 +84,7 @@ export class AuthService {
   }
 
   // Helper Func
-  async signToken(args: { id: string; email: string; role: string }) {
+  async signToken(args: { userId: string; email: string; role: string }) {
     const payload = args;
     return this.jwt.signAsync(payload, {
       secret: jwtSecret,

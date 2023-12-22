@@ -3,15 +3,13 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
 import { cloud_name, api_key, api_secret } from 'src/constants';
 import { v2 as cloudinary } from 'cloudinary';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { HireDto } from './dto/car-hire-dto';
 
 @Injectable()
 export class CarService {
@@ -116,45 +114,6 @@ export class CarService {
     return res.status(HttpStatus.OK).json({ data: car });
   }
 
-  async hireCar(req: Request, res: Response, id: string, hireDto: HireDto) {
-    const car_to_hire = await this.carDb.findUnique({ where: { id: id } });
-    const { userId } = req.user;
-
-    if (!car_to_hire) {
-      throw new NotFoundException('Car does not exist');
-    }
-
-    const rentedCar = await this.rentalDb.create({
-      data: {
-        paymentStatus: true,
-        user: {
-          connect: { id: userId },
-        },
-        RentedCar: {
-          connect: { id: id },
-        },
-        rentDetail: {
-          create: {
-            billingAddress: { ...hireDto.billingAddress },
-            dropOffInfo: { ...hireDto.dropOffInfo },
-            pickupInfo: { ...hireDto.pickupInfo },
-            paymentInfo: { ...hireDto.paymentInfo },
-          },
-        },
-      },
-      include: {
-        rentDetail: true,
-        user: true,
-        RentedCar: true,
-      },
-    });
-
-    if (!rentedCar) {
-      throw new BadRequestException('Failed to create an hire');
-    }
-
-    res.status(HttpStatus.OK).json({ data: rentedCar });
-  }
   private async uploadImage(image: Express.Multer.File) {
     cloudinary.config({
       cloud_name: cloud_name,

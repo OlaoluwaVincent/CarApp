@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { CarModule } from './car/car.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { storage } from './multer.config';
+import { HireModule } from './hire/hire.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { storage } from './multer.config';
     MulterModule.register({
       storage,
     }),
+    HireModule,
   ],
   controllers: [AppController],
   providers: [AppService],
