@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -115,5 +116,47 @@ export class HireService {
     res
       .status(HttpStatus.OK)
       .json({ message: "You've returned this car, please await acceptance." });
+  }
+
+  async cancelHire(
+    req: Request,
+    res: Response,
+    carId: string,
+    rentedId: string,
+  ) {
+    const { userId } = req.user;
+    const rentedCar = await this.rentalDb.findUnique({
+      where: { id: rentedId },
+    });
+
+    if (!rentedCar) {
+      throw new NotFoundException('This car was not hired');
+    }
+
+    const rentalData = await this.rentalDb.findFirst({
+      where: { id: rentedId, rentedCarId: carId, userId: userId },
+    });
+
+    if (!rentalData) {
+      throw new ForbiddenException(
+        "You don't have permission to do this action.",
+      );
+    }
+    await this.rentalDb.delete({ where: { id: rentalData.id } });
+
+    res.status(HttpStatus.OK).json({ message: 'You have cancelled your hire' });
+  }
+
+  async getAllHiredCars(req: Request, res: Response) {
+    // if (req.user.role !== 'ADMIN') {
+    //   throw new UnauthorizedException(
+    //     'You are not authorized to access this resource',
+    //   );
+    // }
+    const hired_cars = await this.rentalDb.findMany({
+      include: { rentDetail: true, RentedCar: true, user: true },
+    });
+
+    res.status(HttpStatus.OK).json({ data: hired_cars });
   }
 }

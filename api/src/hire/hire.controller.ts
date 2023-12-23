@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { HireService } from './hire.service';
 import { CreateHireDto } from './dto/create-hire.dto';
@@ -35,5 +36,20 @@ export class HireController {
     @Param('rentedId') rentedId: string,
   ) {
     return this.hireService.returnCar(req, res, carId, rentedId);
+  }
+
+  @Post(':carId/cancel/:rentedId')
+  async cancelHire(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('carId') carId: string,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return this.hireService.cancelHire(req, res, carId, rentedId);
+  }
+
+  @Get()
+  async findAll(@Req() req: Request, @Res() res: Response) {
+    return await this.hireService.getAllHiredCars(req, res);
   }
 }

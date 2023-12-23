@@ -48,4 +48,13 @@ export class UserController {
   remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
     return this.userService.remove(req, res, id);
   }
+
+  @Get('cars/:id')
+  userHiredCars(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: string,
+  ) {
+    return this.userService.userHiredCars(req, res, id);
+  }
 }

@@ -15,6 +15,7 @@ import { updateImage } from 'src/helperfunction';
 export class UserService {
   constructor(private prismaDB: PrismaService) {}
   public userDB = this.prismaDB.user;
+  public rentedCar = this.prismaDB.rentedCar;
 
   async findAll(req: Request, res: Response) {
     const { role } = req.user;
@@ -85,8 +86,6 @@ export class UserService {
   }
 
   async remove(req: Request, res: Response, id: string) {
-    const { role } = req.user;
-
     const userToDelete = await this.userDB.findUnique({ where: { id: id } });
 
     if (!userToDelete) {
@@ -109,5 +108,29 @@ export class UserService {
     res
       .status(HttpStatus.MOVED_PERMANENTLY)
       .json({ message: 'User deleted Successfully' });
+  }
+
+  // this gets all the cars hired by a particular user
+  async userHiredCars(req: Request, res: Response, id: string) {
+    const { userId, role } = req.user;
+
+    const userHiredCars = await this.rentedCar.findMany({
+      where: { userId: id },
+      include: { RentedCar: true, rentDetail: true, user: true },
+    });
+
+    if (userId !== id) {
+      throw new UnauthorizedException('This resource does not belong to you');
+    }
+    if (role !== 'ADMIN') {
+      throw new UnauthorizedException('You are not an admin');
+    }
+
+    const userWithoutPassword = userHiredCars.map((record) => {
+      delete record.user.hashedPassword;
+      return record;
+    });
+
+    res.status(HttpStatus.OK).json({ data: userWithoutPassword });
   }
 }
