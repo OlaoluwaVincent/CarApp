@@ -111,26 +111,12 @@ export class UserService {
   }
 
   // this gets all the cars hired by a particular user
-  async userHiredCars(req: Request, res: Response, id: string) {
-    const { userId, role } = req.user;
-
+  async userHiredCars(res: Response, userId: string) {
     const userHiredCars = await this.rentedCar.findMany({
-      where: { userId: id },
-      include: { RentedCar: true, rentDetail: true, user: true },
+      where: { userId: userId },
+      include: { RentedCar: true, rentDetail: true },
     });
 
-    if (userId !== id) {
-      throw new UnauthorizedException('This resource does not belong to you');
-    }
-    if (role !== 'ADMIN') {
-      throw new UnauthorizedException('You are not an admin');
-    }
-
-    const userWithoutPassword = userHiredCars.map((record) => {
-      delete record.user.hashedPassword;
-      return record;
-    });
-
-    res.status(HttpStatus.OK).json({ data: userWithoutPassword });
+    res.status(HttpStatus.OK).json({ data: userHiredCars });
   }
 }

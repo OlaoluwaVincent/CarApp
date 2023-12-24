@@ -17,15 +17,23 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Request, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storage } from 'src/multer.config';
+import { ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('User Routes')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiTags('All Users')
   @Get()
   findAll(@Req() req: Request, @Res() res: Response) {
     return this.userService.findAll(req, res);
+  }
+
+  @Get('cars/:userId')
+  userHiredCars(@Res() res: Response, @Param('userId') userId: string) {
+    return this.userService.userHiredCars(res, userId);
   }
 
   @Get(':id')
@@ -47,14 +55,5 @@ export class UserController {
   @Delete(':id')
   remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
     return this.userService.remove(req, res, id);
-  }
-
-  @Get('cars/:id')
-  userHiredCars(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Param('id') id: string,
-  ) {
-    return this.userService.userHiredCars(req, res, id);
   }
 }

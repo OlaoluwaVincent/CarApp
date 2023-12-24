@@ -59,11 +59,19 @@ export async function uploadImage(image: Express.Multer.File, folder: string) {
 
 export async function uploadMultipleImages(images: Array<Express.Multer.File>) {
   try {
+    cloudinary.config({
+      cloud_name: cloud_name,
+      api_key: api_key,
+      api_secret: api_secret,
+    });
     if (images) {
       const uploadedImages = await Promise.all(
-        images.map((file) => cloudinary.uploader.upload(file.path)),
+        images.map((file) =>
+          cloudinary.uploader.upload(file.path, { folder: 'car_mages' }),
+        ),
       );
       const secureUrls = uploadedImages.map((image) => image.secure_url);
+
       // Return the secure URLs in the response
       return secureUrls;
     } else {

@@ -53,17 +53,25 @@ model Car {
   
 
   car    RentedCar?
+  // owner
 
 }
 
 
+enum ACCPETANCE_STATUS {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
 model RentedCar {
   id              String @id @default(uuid())
   paymentStatus   Boolean @default(false)
-  isReturned   Boolean @default(false)
+  isReturned      Boolean @default(false)
+  isDelivered     Boolean @default(false)
+  status          ACCPETANCE_STATUS @default(PENDING)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
   
   RentedCar      Car  @relation(fields: [rentedCarId], references: [id], onDelete: Cascade)
   rentedCarId    String     @unique  // a car should be rented once

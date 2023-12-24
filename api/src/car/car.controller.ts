@@ -4,16 +4,16 @@ import {
   Post,
   Body,
   UseInterceptors,
-  UploadedFile,
   Res,
   UseGuards,
   Query,
   HttpStatus,
   Param,
+  UploadedFiles,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { storage } from 'src/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -24,10 +24,10 @@ export class CarController {
 
   @UseGuards(JwtAuthGuard)
   @Post('create')
-  @UseInterceptors(FileInterceptor('images', { storage }))
+  @UseInterceptors(FilesInterceptor('images', 4, { storage }))
   async create(
     @Body() createCarDto: CreateCarDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFiles() image: Express.Multer.File[],
     @Res() res: Response,
   ) {
     return this.carService.create(createCarDto, image, res);

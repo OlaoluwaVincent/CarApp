@@ -18,27 +18,54 @@ import { Request, Response } from 'express';
 export class HireController {
   constructor(private readonly hireService: HireService) {}
 
-  @Post(':id')
+  @Post(':carId')
   async hire(
     @Req() req: Request,
     @Res() res: Response,
-    @Param('id') id: string,
+    @Param('carId') cardId: string,
     @Body() hireDto: CreateHireDto,
   ) {
-    return this.hireService.hireCar(req, res, id, hireDto);
+    return this.hireService.createHireOrder(req, res, cardId, hireDto);
   }
 
-  @Post(':carId/return/:rentedId')
-  async returnCar(
+  @Post(':customerId/accept/:rentedId')
+  async acceptUserHire(
+    @Res() res: Response,
+    @Param('customerId') customerId: string,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return this.hireService.acceptHire(res, customerId, rentedId);
+  }
+
+  @Post(':customerId/deliver/:rentedId')
+  async deliverCarToUser(
+    @Res() res: Response,
+    @Param('customerId') customerId: string,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return this.hireService.deliverHire(res, customerId, rentedId);
+  }
+
+  @Post(':customerId/reject/:rentedId')
+  async rejectUserOrder(
+    @Res() res: Response,
+    @Param('customerId') customerId: string,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return this.hireService.rejectHire(res, customerId, rentedId);
+  }
+
+  @Post('car/:carId/accept/:rentedId')
+  async acceptAndPay(
     @Req() req: Request,
     @Res() res: Response,
     @Param('carId') carId: string,
     @Param('rentedId') rentedId: string,
   ) {
-    return this.hireService.returnCar(req, res, carId, rentedId);
+    return this.hireService.acceptCar(req, res, carId, rentedId);
   }
 
-  @Post(':carId/cancel/:rentedId')
+  @Post('car/:carId/cancel/:rentedId')
   async cancelHire(
     @Req() req: Request,
     @Res() res: Response,
@@ -48,8 +75,26 @@ export class HireController {
     return this.hireService.cancelHire(req, res, carId, rentedId);
   }
 
+  @Post('car/:carId/return/:rentedId')
+  async returnCar(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('carId') carId: string,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return this.hireService.returnCar(req, res, carId, rentedId);
+  }
+
   @Get()
   async findAll(@Req() req: Request, @Res() res: Response) {
     return await this.hireService.getAllHiredCars(req, res);
+  }
+  @Get(':rentedId')
+  async findOne(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('rentedId') rentedId: string,
+  ) {
+    return await this.hireService.findOneRentedCar(req, res, rentedId);
   }
 }

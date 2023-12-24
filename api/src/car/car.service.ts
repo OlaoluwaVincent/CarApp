@@ -10,6 +10,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { uploadMultipleImages } from 'src/helperfunction';
 
 @Injectable()
 export class CarService {
@@ -19,11 +20,11 @@ export class CarService {
 
   async create(
     createCarDto: CreateCarDto,
-    images: Express.Multer.File,
+    images: Express.Multer.File[],
     res: Response,
   ) {
     try {
-      const imageUrl = await this.uploadImage(images);
+      const imageUrl = await uploadMultipleImages(images);
 
       if (!imageUrl) {
         throw new BadRequestException('Please provide an image');
@@ -35,7 +36,7 @@ export class CarService {
           ...createCarDto,
           carImage: {
             create: {
-              images: [imageUrl],
+              images: imageUrl,
             },
           },
         },
