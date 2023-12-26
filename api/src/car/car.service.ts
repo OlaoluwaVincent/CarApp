@@ -5,9 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateCarDto } from './dto/create-car.dto';
-import { cloud_name, api_key, api_secret } from 'src/constants';
-import { v2 as cloudinary } from 'cloudinary';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { uploadMultipleImages } from 'src/helperfunction';
@@ -21,9 +19,11 @@ export class CarService {
   async create(
     createCarDto: CreateCarDto,
     images: Express.Multer.File[],
+    req: Request,
     res: Response,
   ) {
     try {
+      const { userId } = req.user;
       const imageUrl = await uploadMultipleImages(images);
 
       if (!imageUrl) {
@@ -34,6 +34,7 @@ export class CarService {
       const carWithImage = await this.carDb.create({
         data: {
           ...createCarDto,
+          User: { connect: { id: userId } },
           carImage: {
             create: {
               images: imageUrl,
@@ -109,29 +110,15 @@ export class CarService {
             images: true,
           },
         },
+        User: {
+          select: {
+            email: true,
+            id: true,
+          },
+        },
       },
     });
 
     return res.status(HttpStatus.OK).json({ data: car });
-  }
-
-  private async uploadImage(image: Express.Multer.File) {
-    cloudinary.config({
-      cloud_name: cloud_name,
-      api_key: api_key,
-      api_secret: api_secret,
-    });
-    try {
-      if (image) {
-        const uploadedImages = await cloudinary.uploader.upload(image.path);
-        const secureUrls = uploadedImages.secure_url;
-        return secureUrls;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error('Error uploading image to Cloudinary:', error);
-      throw new Error('Failed to upload image');
-    }
   }
 }

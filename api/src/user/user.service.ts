@@ -113,8 +113,8 @@ export class UserService {
   // this gets all the cars hired by a particular user
   async userHiredCars(res: Response, userId: string) {
     const userHiredCars = await this.rentedCar.findMany({
-      where: { userId: userId },
-      include: { RentedCar: true, rentDetail: true },
+      where: { renterId: userId },
+      include: { RentedCar: true },
     });
 
     res.status(HttpStatus.OK).json({ data: userHiredCars });

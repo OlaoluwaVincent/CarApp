@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { api_key, api_secret, cloud_name } from './constants';
+import { api_key, api_secret, cloud_name, template_id } from './constants';
 
 import { v2 as cloudinary } from 'cloudinary';
-// import { extractPublicId } from 'cloudinary-build-url';
+import * as sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(process.env.SENDGRID_SECRET);
 
 export async function updateImage(
   fileImage: Express.Multer.File,
@@ -81,4 +83,22 @@ export async function uploadMultipleImages(images: Array<Express.Multer.File>) {
     console.error('Error uploading image to Cloudinary:', error);
     throw new Error('Failed to upload image');
   }
+}
+
+export async function sendGridMail(email: string, dynamicData: any) {
+  const msg = {
+    to: email,
+    from: 'olaoluwa.dev@gmail.com',
+    dynamicTemplateData: dynamicData,
+    templateId: template_id,
+  };
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log('Email sent');
+    })
+    .catch((error: any) => {
+      console.error(error);
+    });
 }

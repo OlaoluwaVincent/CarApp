@@ -23,6 +23,8 @@ model User {
   profileImg     String      @default("")
   state          String      @default("")
   region         String      @default("")
+
+  carsOwned      Car[]
   rentedCars     RentedCar[]
   }
 
@@ -47,14 +49,15 @@ model Car {
   tagDescription String?
   region         String
   state          String
+
+  ownerId        String
+  User           User @relation(fields: [ownerId], references: [id])
   
-  carImage       CarImage   @relation(fields: [carImageId], references: [id], onDelete: Cascade) // a car must have an image
+  carImage       CarImage   @relation(fields: [carImageId], references: [id], onDelete: Cascade)
   carImageId     String     @unique
   
 
   car    RentedCar?
-  // owner
-
 }
 
 
@@ -70,8 +73,8 @@ model RentedCar {
   isDelivered     Boolean @default(false)
   status          ACCPETANCE_STATUS @default(PENDING)
 
-  user            User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId          String
+  Renter          User   @relation(fields: [renterId], references: [id], onDelete: Cascade)
+  renterId        String
   
   RentedCar      Car  @relation(fields: [rentedCarId], references: [id], onDelete: Cascade)
   rentedCarId    String     @unique  // a car should be rented once

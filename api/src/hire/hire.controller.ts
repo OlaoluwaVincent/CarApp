@@ -89,6 +89,7 @@ export class HireController {
   async findAll(@Req() req: Request, @Res() res: Response) {
     return await this.hireService.getAllHiredCars(req, res);
   }
+
   @Get(':rentedId')
   async findOne(
     @Req() req: Request,

@@ -9,6 +9,7 @@ import {
 import { CreateHireDto } from './dto/create-hire.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { Request, Response } from 'express';
+import { sendGridMail } from 'src/helperfunction';
 
 @Injectable()
 export class HireService {
@@ -42,7 +43,7 @@ export class HireService {
 
     const rentedCar = await this.rentalDb.create({
       data: {
-        user: {
+        Renter: {
           connect: { id: userId },
         },
         RentedCar: {
@@ -59,7 +60,7 @@ export class HireService {
       },
       include: {
         rentDetail: true,
-        user: true,
+        Renter: true,
         RentedCar: true,
       },
     });
@@ -78,13 +79,14 @@ export class HireService {
     // check if the car was hired by the right customer
     const isRented = await this.rentalDb.findUnique({
       where: { id: rentedId },
+      include: { Renter: true },
     });
 
     if (!isRented) {
       throw new BadRequestException('This car was not hired');
     }
 
-    if (isRented.userId !== customerId) {
+    if (isRented.renterId !== customerId) {
       throw new ForbiddenException('This car was not hired by you');
     }
 
@@ -96,6 +98,19 @@ export class HireService {
     if (!isUpdated) {
       throw new BadRequestException('Please try again');
     }
+
+    const dynamicData = {
+      subject: 'This is the subject for the stuff',
+      pre_header: 'This is a simple description of the email',
+      caption: 'This is a caption',
+      payment_link: 'https://google.com',
+      car_name: 'ferrari',
+      subtotal: '200,000',
+      total: '200,000',
+      delivery_charges: '20,000',
+    };
+
+    await sendGridMail(isRented.Renter.email, dynamicData);
 
     res
       .status(HttpStatus.OK)
@@ -113,7 +128,7 @@ export class HireService {
     }
 
     // Check if this car was hired in the first place
-    if (isRented.userId !== customerId) {
+    if (isRented.renterId !== customerId) {
       console.log(isRented);
 
       throw new ForbiddenException('You did not hire this car.');
@@ -156,7 +171,7 @@ export class HireService {
       throw new ForbiddenException('You did not hire this car.');
     }
 
-    if (isRented.userId !== customerId) {
+    if (isRented.renterId !== customerId) {
       throw new UnauthorizedException('You did not hire this ride');
     }
 
@@ -194,13 +209,17 @@ export class HireService {
   ) {
     const { userId } = req.user;
 
-    // check if the car was hired byt this customer
+    // check if the car was hired by this customer
     const isHired = await this.rentalDb.findUnique({
-      where: { id: rentalId, rentedCarId: carId, userId: userId },
+      where: { id: rentalId, rentedCarId: carId },
     });
 
     if (!isHired) {
       throw new BadRequestException('Car was not hired');
+    }
+
+    if (isHired.renterId !== userId) {
+      throw new BadRequestException('You did not hire this car!');
     }
 
     // Check if the carOwner has accepted the Hire Order.
@@ -221,10 +240,29 @@ export class HireService {
       throw new BadRequestException('Please try again later');
     }
 
-    await this.carDb.update({
+    const updated_car = await this.carDb.update({
       where: { id: carId },
       data: { rented: true },
+      include: {
+        User: {
+          select: {
+            email: true,
+          },
+        },
+      },
     });
+    const dynamicData = {
+      subject: 'Payment Successful',
+      pre_header: `The Hire order for ${updated_car.name} has been settled`,
+      caption: `The Hire order for ${updated_car.name} has been settled. Please kindly deliver this car in time`,
+      payment_link: '',
+      car_name: updated_car.name,
+      subtotal: updated_car.amount,
+      total: updated_car.amount,
+      delivery_charges: '20,000',
+    };
+
+    await sendGridMail(updated_car.User.email, dynamicData);
 
     res
       .status(HttpStatus.OK)
@@ -247,11 +285,7 @@ export class HireService {
       throw new NotFoundException('This car was not hired');
     }
 
-    const rentalData = await this.rentalDb.findFirst({
-      where: { rentedCarId: carId, userId: userId },
-    });
-
-    if (!rentalData) {
+    if (rentedCar.renterId !== userId) {
       throw new ForbiddenException(
         "You don't have permission to do this action",
       );
@@ -271,16 +305,16 @@ export class HireService {
     const { userId } = req.user;
 
     const hiredCar = await this.carDb.findUnique({
-      where: { id: carId },
+      where: { id: carId, rented: true },
     });
 
     if (!hiredCar) {
-      throw new BadRequestException('This car does not exist');
+      throw new BadRequestException('This car does not exist or was not hired');
     }
 
     // get the car and check if it was this user that hiredIt
     const wasHired = await this.rentalDb.findUnique({
-      where: { id: rentedId, userId: userId },
+      where: { id: rentedId, renterId: userId },
     });
 
     if (!wasHired) {
@@ -317,7 +351,7 @@ export class HireService {
     // }
     const hired_cars = await this.rentalDb.findMany({
       where: { isReturned: false },
-      include: { rentDetail: true, RentedCar: true, user: true },
+      include: { rentDetail: true, RentedCar: true, Renter: true },
     });
 
     res.status(HttpStatus.OK).json({ data: hired_cars });
@@ -331,7 +365,7 @@ export class HireService {
     // }
     const hired_cars = await this.rentalDb.findUnique({
       where: { id: rentedId },
-      include: { rentDetail: true, RentedCar: true, user: true },
+      include: { rentDetail: true, RentedCar: true, Renter: true },
     });
 
     res.status(HttpStatus.OK).json({ data: hired_cars });
