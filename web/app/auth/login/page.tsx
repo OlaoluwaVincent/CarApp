@@ -1,32 +1,49 @@
 'use client';
 
-// import { Metadata } from 'next';
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from 'src/redux/features/auth_slice';
-import { AppDispatch, RootState } from 'src/redux/store';
-// export const metadata: Metadata = {
-// 	title: 'Sign In',
-// };
+import ClientComp from '@/components/ClientComp';
+import Link from 'next/link';
+import { useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store';
+import LoginForm from './loginForm';
+import { useRef, useEffect } from 'react';
 
 function LoginPage() {
-	const dispatch: AppDispatch = useDispatch();
 	const loading = useSelector((state: RootState) => state.auth.loading);
 	const error = useSelector((state: RootState) => state.auth.error);
 
-	const [email, setEmail] = useState('ola');
-	const [password, setPassword] = useState('password');
+	const elementRef = useRef<HTMLDivElement | null>(null);
 
-	const handleLogin = () => {
-		// Dispatch the loginUser async thunk with the email and password
-		dispatch(loginUser({ email, password }));
-	};
+	useEffect(() => {
+		if (elementRef.current && error) {
+			elementRef?.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	}, [error]);
+
+	if (loading) {
+		return <p className='animate-pulse'>Loading...</p>;
+	}
 
 	return (
-		<div>
-			The Login Page
-			<button onClick={handleLogin}>Click</button>
-		</div>
+		<ClientComp>
+			<div className='flex items-center justify-center flex-col w-[90%] md:w-[500px] mx-auto'>
+				{error && (
+					<p className='text-error-500 text-sm font-medium'>
+						{error}
+					</p>
+				)}
+				<LoginForm />
+			</div>
+
+			<p className='mt-2'>
+				Do not have an account?{' '}
+				<Link
+					href={'/auth/register'}
+					className='text-sm text-dark-600 cursor-pointer'
+				>
+					Register here
+				</Link>
+			</p>
+		</ClientComp>
 	);
 }
 export default LoginPage;
