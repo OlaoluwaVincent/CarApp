@@ -25,15 +25,9 @@ import { ApiTags } from '@nestjs/swagger';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiTags('All Users')
   @Get()
-  findAll(@Req() req: Request, @Res() res: Response) {
-    return this.userService.findAll(req, res);
-  }
-
-  @Get('cars/:userId')
-  userHiredCars(@Res() res: Response, @Param('userId') userId: string) {
-    return this.userService.userHiredCars(res, userId);
+  getUserDetails(@Req() req: Request, @Res() res: Response) {
+    return this.userService.getUserDetails(req, res);
   }
 
   @Get(':id')
@@ -41,19 +35,24 @@ export class UserController {
     return this.userService.findOne(res, id);
   }
 
-  @Patch('update/:id')
+  @Patch('update')
   @UseInterceptors(FileInterceptor('profileImage', { storage }))
   update(
+    @Req() req: Request,
     @Res() res: Response,
-    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() image: Express.Multer.File,
   ) {
-    return this.userService.updateProfile(res, id, updateUserDto, image);
+    return this.userService.updateProfile(req, res, updateUserDto, image);
   }
 
-  @Delete(':id')
-  remove(@Req() req: Request, @Res() res: Response, @Param('id') id: string) {
-    return this.userService.remove(req, res, id);
+  @Delete()
+  remove(@Req() req: Request, @Res() res: Response) {
+    return this.userService.remove(req, res);
+  }
+
+  @Get('cars/:userId')
+  userHiredCars(@Res() res: Response, @Param('userId') userId: string) {
+    return this.userService.userHiredCars(res, userId);
   }
 }

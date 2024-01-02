@@ -8,7 +8,7 @@ declare module 'express' {
   }
 }
 
-type User = {
+export type User = {
   userId: string;
   email: string;
   role: string;

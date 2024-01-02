@@ -29,11 +29,14 @@ model User {
   }
 
 
+
+
 model CarImage {
   id     String   @id @default(uuid())
   images String[]
   car    Car?
 }
+
 
 model Car {
   id             String      @id @default(uuid())

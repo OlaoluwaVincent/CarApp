@@ -17,21 +17,16 @@ export class UserService {
   public userDB = this.prismaDB.user;
   public rentedCar = this.prismaDB.rentedCar;
 
-  async findAll(req: Request, res: Response) {
-    const { role } = req.user;
-    if (role !== 'ADMIN') {
-      throw new UnauthorizedException('You are not an Admin');
+  async getUserDetails(req: Request, res: Response) {
+    const { userId } = req.user;
+    const user = await this.userDB.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new BadRequestException('User does not exist');
     }
+    delete user.hashedPassword;
 
-    const allUsers = await this.userDB.findMany();
-
-    const users = allUsers.map((users) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { hashedPassword, ...rest } = users;
-      return rest;
-    });
-
-    res.status(HttpStatus.OK).json({ data: users });
+    res.status(HttpStatus.OK).json({ data: user });
   }
 
   async findOne(res: Response, id: string) {
@@ -48,12 +43,13 @@ export class UserService {
   }
 
   async updateProfile(
+    req: Request,
     res: Response,
-    id: string,
     updateUserDto: UpdateUserDto,
     image: Express.Multer.File,
   ) {
-    const user = await this.userDB.findUnique({ where: { id } });
+    const { userId } = req.user;
+    const user = await this.userDB.findUnique({ where: { id: userId } });
     if (!user) throw new BadRequestException('User not found');
 
     // Upload Image to Cloudinary
@@ -65,49 +61,46 @@ export class UserService {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }
 
-    const profileToUpdate = await this.userDB.update({
-      where: { id: id },
+    const updatedProfile = await this.userDB.update({
+      where: { id: userId },
       data: {
         address: updateUserDto.address,
-        email: updateUserDto.email,
-        name: updateUserDto.name,
-        region: updateUserDto.region,
-        state: updateUserDto.state,
-        hashedPassword: updateUserDto.password,
-        profileImg: imageUrl,
+        email: updateUserDto.email ?? user.email,
+        name: updateUserDto.name ?? user.name,
+        region: updateUserDto.region ?? user.region,
+        state: updateUserDto.state ?? user.state,
+        hashedPassword: updateUserDto.password ?? user.hashedPassword,
+        profileImg: imageUrl ?? user.profileImg,
       },
     });
 
-    if (!profileToUpdate) {
+    if (!updatedProfile) {
       throw new BadRequestException('Failed to create profile');
     }
 
-    res.status(HttpStatus.OK).json({ data: profileToUpdate });
+    delete updatedProfile.hashedPassword;
+    res.status(HttpStatus.OK).json({ data: updatedProfile });
   }
 
-  async remove(req: Request, res: Response, id: string) {
-    const userToDelete = await this.userDB.findUnique({ where: { id: id } });
+  async remove(req: Request, res: Response) {
+    const { userId } = req.user;
+    const userToDelete = await this.userDB.findUnique({
+      where: { id: userId },
+    });
 
     if (!userToDelete) {
       throw new NotFoundException("The user doesn't exist");
     }
 
-    if (userToDelete.id !== id) {
+    if (userToDelete.id !== userId) {
       throw new UnauthorizedException(
         'You are not authorized to access this resource.',
       );
     }
-    // if (role !== 'ADMIN') {
-    //   throw new UnauthorizedException(
-    //     'Only admins and owners are authorized to access this resource.',
-    //   );
-    // }
 
-    await this.userDB.delete({ where: { id: id } });
+    await this.userDB.delete({ where: { id: userId } });
 
-    res
-      .status(HttpStatus.MOVED_PERMANENTLY)
-      .json({ message: 'User deleted Successfully' });
+    res.status(HttpStatus.OK).json({ message: 'User deleted Successfully' });
   }
 
   // this gets all the cars hired by a particular user

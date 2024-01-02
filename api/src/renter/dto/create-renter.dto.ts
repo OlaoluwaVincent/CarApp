@@ -85,7 +85,7 @@ export class PaymentInfoDto {
   cvv: string;
 }
 
-export class CreateHireDto {
+export class CreateRenterDto {
   @ApiProperty({
     type: RentalInfoDto,
     description: 'Pickup information',

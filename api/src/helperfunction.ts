@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { api_key, api_secret, cloud_name, template_id } from './constants';
+import { Request } from 'express';
 
 import { v2 as cloudinary } from 'cloudinary';
 import * as sgMail from '@sendgrid/mail';
+import { UnauthorizedException } from '@nestjs/common';
 
 sgMail.setApiKey(process.env.SENDGRID_SECRET);
 
@@ -101,4 +103,12 @@ export async function sendGridMail(email: string, dynamicData: any) {
     .catch((error: any) => {
       console.error(error);
     });
+}
+
+export async function checkUserRole(userObj: Request) {
+  if ('CUSTOMER' !== userObj.user.role) {
+    throw new UnauthorizedException(
+      'You do not have the role to perform this action.',
+    );
+  }
 }

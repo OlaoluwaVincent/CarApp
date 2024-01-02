@@ -14,7 +14,7 @@ import {
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { storage } from 'src/multer.config';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
@@ -28,9 +28,10 @@ export class CarController {
   async create(
     @Body() createCarDto: CreateCarDto,
     @UploadedFiles() image: Express.Multer.File[],
+    @Res() req: Request,
     @Res() res: Response,
   ) {
-    return this.carService.create(createCarDto, image, res);
+    return this.carService.create(createCarDto, image, req, res);
   }
 
   @Get()

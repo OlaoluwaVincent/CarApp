@@ -21,7 +21,9 @@ export class AuthService {
 
   public userDB = this.prismaDb.user;
 
-  async create(createAuthDto: CreateAuthDto) {
+  async create(createAuthDto: CreateAuthDto, role: string) {
+    console.log(role);
+    const userRole = role === 'renter' ? 'CUSTOMER' : 'SELLER';
     const isExisting = await this.userDB.findUnique({
       where: { email: createAuthDto.email },
     });
@@ -39,6 +41,7 @@ export class AuthService {
         email: createAuthDto.email,
         name: createAuthDto.name,
         hashedPassword,
+        role: userRole,
       },
     });
 
