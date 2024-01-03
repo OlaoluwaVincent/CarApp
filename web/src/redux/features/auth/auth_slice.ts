@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Error, loginService } from './auth_services';
+import { Error, loginService, registerService } from './auth_services';
 
 type InitialData = {
 	id: string;
@@ -22,13 +22,34 @@ export const loginUser = createAsyncThunk<
 	InitialData,
 	{ email: string; password: string },
 	{
-		rejectValue: Error; // Specify the type for rejectValue
+		rejectValue: Error;
 	}
 >(
 	'loginUser',
 	async (data: { email: string; password: string }, { rejectWithValue }) => {
 		try {
 			const result = await loginService(data);
+			return result;
+		} catch (error: any) {
+			return rejectWithValue(error as Error);
+		}
+	}
+);
+
+export const registerUser = createAsyncThunk<
+	InitialData,
+	{ name: string; email: string; password: string },
+	{
+		rejectValue: Error;
+	}
+>(
+	'registerUser',
+	async (
+		data: { name: string; email: string; password: string },
+		{ rejectWithValue }
+	) => {
+		try {
+			const result = await registerService(data);
 			return result;
 		} catch (error: any) {
 			return rejectWithValue(error as Error);
@@ -44,6 +65,7 @@ export const auth = createSlice({
 		// Handle pending action
 		builder.addCase(loginUser.pending, (state) => {
 			state.loading = true;
+			state.error = '';
 		});
 
 		// Handle fulfilled action
@@ -55,6 +77,23 @@ export const auth = createSlice({
 
 		// Handle rejected action
 		builder.addCase(loginUser.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload?.message;
+		});
+		builder.addCase(registerUser.pending, (state) => {
+			state.loading = true;
+			state.error = '';
+		});
+
+		// Handle fulfilled action
+		builder.addCase(registerUser.fulfilled, (state, action) => {
+			state.loading = false;
+			state.data = action.payload;
+			state.error = '';
+		});
+
+		// Handle rejected action
+		builder.addCase(registerUser.rejected, (state, action) => {
 			state.loading = false;
 			state.error = action.payload?.message;
 		});

@@ -3,6 +3,9 @@
 import FormInput from '@/components/FormInput';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { useState } from 'react';
+import { registerUser } from 'src/redux/features/auth/auth_slice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from 'src/redux/store';
 
 const sans = Plus_Jakarta_Sans({
 	subsets: ['latin'],
@@ -11,6 +14,8 @@ const sans = Plus_Jakarta_Sans({
 });
 
 const RegisterForm = () => {
+	const dispatch = useDispatch<AppDispatch>();
+
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -43,13 +48,13 @@ const RegisterForm = () => {
 
 	function handleFormSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		console.log(name, email, password);
+		dispatch(registerUser({ name, email, password }));
 	}
 
 	return (
 		<div className='flex justify-start flex-col gap-10 w-full'>
 			<h1
-				className={`${sans.className} font-bold leading-[-0.1px] text-4xl text-center`}
+				className={`${sans.className} font-bold text-4xl text-center`}
 			>
 				Create Account
 			</h1>
@@ -62,16 +67,19 @@ const RegisterForm = () => {
 					placeholder='Enter username'
 					currentState={name}
 					updateState={updateName}
+					type='text'
 				/>
 				<FormInput
 					label='Email'
 					placeholder='email@email.com'
 					currentState={email}
 					updateState={updateEmail}
+					type='email'
 				/>
 				<div className='flex gap-3 justify-between'>
 					<aside>
 						<FormInput
+							type='password'
 							label='Password'
 							placeholder='*********'
 							currentState={password}
@@ -88,6 +96,7 @@ const RegisterForm = () => {
 					</aside>
 					<aside>
 						<FormInput
+							type='password'
 							label='Confirm Password'
 							placeholder='*********'
 							currentState={cpassword}

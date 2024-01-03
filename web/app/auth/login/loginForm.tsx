@@ -19,16 +19,12 @@ const LoginForm = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState('');
-	const [isVisible, setIsVisible] = useState(false);
 
 	function updateEmail(newValue: string) {
 		setEmail(newValue);
 	}
 	function updatePassword(newValue: string) {
 		setPassword(newValue);
-	}
-	function togglePasswordShow(newValue: boolean) {
-		setIsVisible(newValue);
 	}
 
 	function handleFormSubmit(e: React.FormEvent) {
@@ -62,8 +58,6 @@ const LoginForm = () => {
 					placeholder='*********'
 					currentState={password}
 					updateState={updatePassword}
-					isVisible={isVisible}
-					toggleVisibility={togglePasswordShow}
 				/>
 
 				<button

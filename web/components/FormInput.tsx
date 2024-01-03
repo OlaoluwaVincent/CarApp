@@ -1,4 +1,5 @@
-import { memo } from 'react';
+'use client';
+import { memo, useState } from 'react';
 import { IoIosEye, IoIosEyeOff } from 'react-icons/io';
 
 interface Props {
@@ -8,11 +9,10 @@ interface Props {
 	labelClassName?: string;
 	placeholder?: string;
 	updateState(newValue: string | undefined): void;
-	toggleVisibility?(newValue: boolean): void;
 	currentState?: string;
-	isVisible?: boolean;
 }
 const FormInput = memo(function FormInput(props: Props) {
+	const [isVisible, setIsVisible] = useState(false);
 	return (
 		<div className='flex justify-start flex-col gap-2 w-full'>
 			<label
@@ -23,7 +23,7 @@ const FormInput = memo(function FormInput(props: Props) {
 			</label>
 			<div className='relative'>
 				<input
-					type={props.isVisible ? 'text' : props.type}
+					type={isVisible ? 'text' : props.type}
 					required
 					placeholder={props.placeholder}
 					className={
@@ -35,28 +35,16 @@ const FormInput = memo(function FormInput(props: Props) {
 				/>
 				{props.type == 'password' && (
 					<span className='absolute right-2 top-1/2 -translate-y-1/2'>
-						{props.isVisible && (
+						{isVisible && (
 							<IoIosEyeOff
 								className='text-2xl cursor-pointer'
-								onClick={() =>
-									props.toggleVisibility
-										? props.toggleVisibility(
-												!props.isVisible
-										  )
-										: undefined
-								}
+								onClick={() => setIsVisible(false)}
 							/>
 						)}
-						{!props.isVisible && (
+						{!isVisible && (
 							<IoIosEye
 								className='text-2xl cursor-pointer'
-								onClick={() =>
-									props.toggleVisibility
-										? props.toggleVisibility(
-												!props.isVisible
-										  )
-										: undefined
-								}
+								onClick={() => setIsVisible(true)}
 							/>
 						)}
 					</span>
