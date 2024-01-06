@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang='en'>
-			<body className={poppins_italic.className}>
+			<body className={`${poppins_italic.className}`}>
 				<Header />
 				<ReduxProvider>{children}</ReduxProvider>
 			</body>
