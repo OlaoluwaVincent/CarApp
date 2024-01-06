@@ -25,7 +25,9 @@ export default function RootLayout({
 			<body className={`${poppins_italic.className}`}>
 				<ReduxProvider>
 					<Header />
-					{children}
+					<section className="p-5">
+						{children}
+					</section>
 				</ReduxProvider>
 			</body>
 		</html>
