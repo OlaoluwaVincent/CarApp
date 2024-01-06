@@ -1,29 +1,29 @@
-'use client'
+'use client';
 
-import Image from 'next/image';
-import logoIcon from '../../public/svg/logo.png';
-import redirectToDashboardIfLoggedIn from '@/components/IsLoggedIn';
+import LogoImg from "@/components/LogoImg";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
 
 export default function AuthLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const { isLoggedIn } = redirectToDashboardIfLoggedIn();
+	const router = useRouter();
+	const user_data = useSelector((state: RootState) => state.auth.data);
 
-	if (isLoggedIn) {
-		// navigate the user to dashboard screen
-	}
+	useEffect(() => {
+		if (user_data && user_data.id) {
+			// Navigate the user to the dashboard screen only if not already there
+			router.replace('/');
+		}
+	}, [user_data]);
+
 	return (
 		<section className='flex flex-col items-center justify-center md:gap-3 h-full py-5'>
-			<Image
-				src={logoIcon}
-				alt='Website logo icons'
-				height={150}
-				width={200}
-				priority={true}
-				className='mx-auto mb-5'
-			/>
+			<LogoImg height={150} width={200} />
 			{children}
 		</section>
 	);

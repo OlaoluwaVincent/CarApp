@@ -54,14 +54,13 @@ export const registerService = async (userData: {
 	email: string;
 	password: string;
 }) => {
-	console.log('register', userData);
 	try {
 		const response = await axiosInstance.post('auth/register', userData);
 		const {
-			data: { data: result },
+			data: { data: result, token }
 		} = response;
-		localStorage.setItem('token', result.token);
-		return result.data;
+		localStorage.setItem('token', token);
+		return result;
 	} catch (error: any) {
 		// check if user is online
 		if (!isOnline()) {

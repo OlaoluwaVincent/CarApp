@@ -1,5 +1,5 @@
 interface Props {}
 const DashboardPage = (props: Props) => {
-	return <div className=''>DashboardPage oo</div>;
+	return <div className=''>Actual Dashboard</div>;
 };
 export default DashboardPage;

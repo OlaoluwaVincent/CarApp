@@ -1,22 +1,30 @@
-import { FaBell } from '../app/utils';
+import LogoImg from './LogoImg';
+import Profile from './Profile';
+import SeachInput from './SeachInput';
 
 const Header = () => {
 	return (
-		<header className='grid grid-cols-12 w-full'>
+		<header className='grid grid-cols-12 w-full h-max md:h-[92px] lg:h-[112px] py-3 px-5 bg-white gap-4'>
 			{/* logo */}
-			<div className='col-span-6 md:col-span-3 bg-gray-300 p-4'>One</div>
+			<div className='flex items-center sm:justify-center col-span-6 sm:col-span-3'>
+				<div>
+					<LogoImg height={50} width={100} />
+				</div>
+			</div>
 
 			{/* // Search component */}
-			<div className='hidden md:block col-start-4 col-span-6 bg-blue-500 p-4'>
-				Two
+			<div className='hidden sm:flex items-center justify-start col-start-4 col-span-6'>
+				<SeachInput />
 			</div>
 			{/* Profile component */}
-			<div className='col-span-6 md:col-span-3 bg-gray-300 p-4'>
-				Three
+			<div className='flex items-center justify-center col-span-6 sm:col-span-3'>
+				<Profile />
 			</div>
 
 			{/* search component */}
-			<div className='md:hidden col-span-12 bg-blue-500 p-4'>Two</div>
+			<div className='flex items-center justify-center w-full sm:hidden col-span-12 mx-auto'>
+				<SeachInput />
+			</div>
 		</header>
 	);
 };

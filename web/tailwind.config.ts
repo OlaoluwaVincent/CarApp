@@ -137,6 +137,9 @@ const config: Config = {
 					},
 				],
 			},
+			screens: {
+				'base': '420px',
+			  },
 		},
 	},
 	plugins: [],
