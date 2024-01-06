@@ -1,17 +1,21 @@
 'use client';
 import { RootState } from 'src/redux/store';
-import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 
 const redirectToDashboardIfLoggedIn = () => {
-	const router = useRouter();
+	const [isLoggedIn, setIsLoggedId] = useState(false)
+	const [isAdmin, setIsAdmin] = useState(false)
 	const user_data = useSelector((state: RootState) => state.auth.data);
 
 	// Check if user is logged in
 	if (user_data && user_data.id !== '') {
-		router.replace('/dashboard');
+		setIsLoggedId(true)
 	}
-   console.log('You are not logged in')
+	if (user_data && user_data.role === 'ADMIN') {
+		setIsAdmin(true)
+	}
+	return { isLoggedIn, isAdmin }
 };
 
 export default redirectToDashboardIfLoggedIn;

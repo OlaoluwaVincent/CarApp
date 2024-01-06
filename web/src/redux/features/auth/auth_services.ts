@@ -41,7 +41,7 @@ export const loginService = async (userData: {
 		}
 
 		const errorData: Error = {
-			message: error.response?.data?.message || 'An error occurred',
+			message: error.response?.data?.message || 'Error connecting to server',
 			error: error.response?.data?.error || 'Unknown error',
 			statusCode: error.response?.status || 500,
 		};
