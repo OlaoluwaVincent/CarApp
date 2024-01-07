@@ -6,7 +6,7 @@ const Header = () => {
 	return (
 		<header className='grid grid-cols-12 w-full h-max md:h-[92px] lg:h-[112px] py-3 px-5 bg-white gap-4'>
 			{/* logo */}
-			<div className='flex items-center sm:justify-center col-span-6 sm:col-span-3'>
+			<div className='flex items-center col-span-6 sm:col-span-3'>
 				<div>
 					<LogoImg height={50} width={100} />
 				</div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
 import ReduxProvider from 'src/redux/provider';
-import Header from '../components/Header';
+import Header from '@/components/Header';
 
 const poppins_italic = Poppins({
 	weight: '300',
@@ -25,7 +25,7 @@ export default function RootLayout({
 			<body className={`${poppins_italic.className}`}>
 				<ReduxProvider>
 					<Header />
-					<section className="p-5">
+					<section className="px-5 py-5">
 						{children}
 					</section>
 				</ReduxProvider>

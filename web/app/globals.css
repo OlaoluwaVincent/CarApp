@@ -12,6 +12,9 @@
 	color: #040815;
 }
 
+body{
+	min-height: 100svh;
+}
 img {
 	display: block;
 }

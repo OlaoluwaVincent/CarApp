@@ -1,5 +1,9 @@
-interface Props {}
+import Hero from "@/components/Hero";
+
+interface Props { }
 const Homepage = (props: Props) => {
-	return <div className=''>Homepage oo</div>;
+	return <div className='w-full'>
+		<Hero />
+	</div>;
 };
 export default Homepage;
