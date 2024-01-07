@@ -5,7 +5,7 @@ import { MdSettings } from 'react-icons/md';
 import { BiSolidGasPump } from 'react-icons/bi';
 import { HiUsers } from 'react-icons/hi2';
 import { TbSteeringWheel } from 'react-icons/tb';
-
+import { TbArrowsUpDown } from "react-icons/tb";
 export {
 	CiSearch,
 	BiSolidGasPump,
@@ -14,4 +14,5 @@ export {
 	TiHeartFullOutline,
 	HiUsers,
 	TbSteeringWheel,
+	TbArrowsUpDown
 };
