@@ -1,4 +1,4 @@
-import axiosInstance from 'src/utils/axios';
+import axiosInstance, { isOnline } from 'src/utils/axios';
 
 interface Data {
 	data: {
@@ -20,9 +20,6 @@ export interface Error {
 	statusCode: number;
 }
 
-function isOnline() {
-	return navigator.onLine;
-}
 
 export const loginService = async (userData: {
 	email: string;

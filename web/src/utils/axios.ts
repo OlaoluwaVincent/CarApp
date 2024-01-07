@@ -21,3 +21,8 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 export default axiosInstance;
+
+
+export function isOnline() {
+	return navigator.onLine;
+}

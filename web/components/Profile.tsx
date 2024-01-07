@@ -27,6 +27,7 @@ const Profile = (props: Props) => {
       <span><MdSettings size={'30px'} className='hidden base:inline-flex fill-black-400 cursor-pointer' /></span>
 
       <aside>
+        {user_data && <p>{user_data.name}</p>}
         <Image src={user_data?.profileImg ?? ProfileImg} sizes='auto' alt={'Profile image of the ' + user_data?.name} className='max-w-[40px] aspect-square rounded-full border border-black-200' />
       </aside>
     </div>
