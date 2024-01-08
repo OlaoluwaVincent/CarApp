@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Param,
   UploadedFiles,
+  Req,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { CreateCarDto } from './dto/create-car.dto';
@@ -28,7 +29,7 @@ export class CarController {
   async create(
     @Body() createCarDto: CreateCarDto,
     @UploadedFiles() image: Express.Multer.File[],
-    @Res() req: Request,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
     return this.carService.create(createCarDto, image, req, res);
@@ -39,11 +40,13 @@ export class CarController {
     @Res() res: Response,
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
     @Query('page') page?: number,
+    @Query('search') search?: string,
+    @Query('type') type?: string,
+    @Query('steering') steering?: string,
   ) {
     try {
-      return this.carService.findAll(res, sort, page);
+      return this.carService.findAll(res, sort, page, search, type, steering);
     } catch (error) {
-      console.error(error);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ error: 'Internal Server Error' });

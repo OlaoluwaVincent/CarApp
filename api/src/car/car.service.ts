@@ -12,7 +12,7 @@ import { uploadMultipleImages } from 'src/helperfunction';
 
 @Injectable()
 export class CarService {
-  constructor(private prismaDB: PrismaService) {}
+  constructor(private prismaDB: PrismaService) { }
   public carDb = this.prismaDB.car;
   public rentalDb = this.prismaDB.rentedCar;
 
@@ -56,13 +56,11 @@ export class CarService {
 
       return res.status(HttpStatus.CREATED).json({ data: carWithImage });
     } catch (error) {
-      // Handle the error appropriately, e.g., log it or send an error response
-      console.error(error);
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
 
-  async findAll(res: Response, sort: 'asc' | 'desc', page?: number) {
+  async findAll(res: Response, sort: 'asc' | 'desc', page?: number, search?: string, type?: string, steering?: string) {
     try {
       const perPage = 10;
       const pageNumber = !page ? 1 : page;
@@ -70,6 +68,20 @@ export class CarService {
 
       const [allCars, totalCount] = await Promise.all([
         this.carDb.findMany({
+          where: {
+            name: {
+              contains: search,
+              mode: 'insensitive',
+            },
+            carType: {
+              contains: type,
+              mode: 'insensitive',
+            },
+            steering: {
+              contains: steering,
+              mode: 'insensitive',
+            },
+          },
           include: {
             carImage: {
               select: {
@@ -86,7 +98,7 @@ export class CarService {
         this.carDb.count(), // Get the total count of cars (for pagination)
       ]);
 
-      // this returns the total number of pages that the data could be splitted into.
+      // this returns the total number of pages that the data could be split into.
       const totalPages = Math.ceil(totalCount / perPage);
 
       return res.status(HttpStatus.OK).json({
@@ -96,7 +108,6 @@ export class CarService {
         totalPages,
       });
     } catch (error) {
-      console.error(error);
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
@@ -121,4 +132,5 @@ export class CarService {
 
     return res.status(HttpStatus.OK).json({ data: car });
   }
+
 }

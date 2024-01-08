@@ -1,8 +1,16 @@
+'use client'
+
+import { useState } from "react";
+
+
 type Props = {
     label: string;
     id:string;
 }
 const Pick = (props: Props) => {
+    const [date, setDate] = useState('')
+    const [Time, setTime] = useState('')
+    const [location, setLocation] = useState('')
     return (
         <div className="w-full sm:w-[70%] flex flex-col gap-4 px-3 md:px-10 py-3 bg-white border border-black-200 rounded-xl">
             <aside>

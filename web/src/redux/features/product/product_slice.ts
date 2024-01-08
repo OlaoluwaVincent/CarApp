@@ -1,34 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { findAll } from './product_services';
+import { GetProductsData, InitialState, Product } from 'src/utils/typing';
 
-type InitialState = {
-	data: {},
-	loading: boolean,
-	error: undefined | string
-}
 
-export const getProducts = createAsyncThunk<
-	{},
-	{ sort: string; page: string },
-	{
-		rejectValue: Error;
-	}
->(
+const initData: InitialState = {
+	data: null,
+	loading: false,
+	error: '',
+};
+
+export const getProducts = createAsyncThunk<Product, GetProductsData, { rejectValue: Error }>(
 	'getProducts',
-	async (data: { sort: string; page: string }, { rejectWithValue }) => {
+	async (data: GetProductsData, { rejectWithValue }) => {
 		try {
-			const result = await findAll(data.sort, data.page);
+			const result = await findAll(data);
 			return result;
 		} catch (error: any) {
 			return rejectWithValue(error as Error);
 		}
 	}
 );
-
-
 export const productSlice = createSlice({
 	name: 'product',
-	initialState: {} as InitialState,
+	initialState: initData,
 	reducers: {},
 	extraReducers: (builder) => {
 		builder.addCase(getProducts.pending, (state) => {
@@ -36,19 +30,17 @@ export const productSlice = createSlice({
 			state.error = '';
 		});
 
-		// Handle fulfilled action
 		builder.addCase(getProducts.fulfilled, (state, action) => {
 			state.loading = false;
 			state.data = action.payload;
 			state.error = '';
 		});
 
-		// Handle rejected action
 		builder.addCase(getProducts.rejected, (state, action) => {
 			state.loading = false;
 			state.error = action.payload?.message;
 		});
-	}
-})
+	},
+});
 
 export default productSlice.reducer;

@@ -1,24 +1,5 @@
 import axiosInstance, { isOnline } from 'src/utils/axios';
-
-interface Data {
-	data: {
-		id: string;
-		email: string;
-		name: string;
-		role: string;
-		address: string;
-		profileImg: string;
-		state: string;
-		region: string;
-	};
-	token: string;
-}
-
-export interface Error {
-	message: string;
-	error: string;
-	statusCode: number;
-}
+import { AuthData, Error } from 'src/utils/typing';
 
 
 export const loginService = async (userData: {
@@ -27,7 +8,7 @@ export const loginService = async (userData: {
 }) => {
 	try {
 		const response = await axiosInstance.post('/auth/login', userData);
-		const result: Data = response.data;
+		const result: AuthData = response.data;
 		localStorage.setItem('token', result.token);
 		return result.data;
 	} catch (error: any) {

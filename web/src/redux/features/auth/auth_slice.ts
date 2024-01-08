@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Error, loginService, registerService } from './auth_services';
+import { loginService, registerService } from './auth_services';
+import { Error } from 'src/utils/typing';
 
 type InitialData = {
 	id: string;

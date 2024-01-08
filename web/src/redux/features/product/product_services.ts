@@ -1,25 +1,19 @@
 import axiosInstance, { isOnline } from "src/utils/axios"
-import { Error } from "../auth/auth_services";
+import { Error, Product } from "src/utils/typing";
 
 
-interface ProductData {
-    data: any,
-    length: number,
-    totalCars: number,
-    totalPages: number
-}
-
-
-export const findAll = async (sort: string, page: string) => {
-    const pageNumber = Number(page)
+export const findAll = async (data: {sort?: string, page?: string, search?: string, type?: string, steering?: string}) => {
     try {
         const response = await axiosInstance.get('/car', {
             params: {
-                sort: sort,
-                page: pageNumber
+                page: data.page ? Number(data.page) : 1,
+                sort:data.sort ?? 'asc',
+                type:data.type,
+                search:data.search,
+                steerring:data.steering
             },
         });
-        const result:ProductData = response.data;
+        const result: Product = response.data;
         return result
     } catch (error: any) {
         if (!isOnline()) {
@@ -33,6 +27,7 @@ export const findAll = async (sort: string, page: string) => {
             error: error.response?.data?.error || 'Unknown error',
             statusCode: error.response?.status || 500,
         };
+
         throw errorData;
     }
 }
