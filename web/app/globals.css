@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+::before,
+::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: inherit;
+	color: #040815;
+}
+
+body {
+	min-height: 100svh;
+}
+
+input[type='radio']{
+	cursor: pointer;
+}
+
+/* In your CSS or SCSS file */
+.shadow-crescendo {
+	box-shadow: -10px -10px 30px 4px rgba(0, 0, 0, 0.1), 10px 10px 30px 4px rgba(45, 78, 255, 0.15);
+}
+
+.shadow-asthetic {
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-mild {
+	box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+}
+
+.shadow-jubilate {
+	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+img {
+	display: block;
+}

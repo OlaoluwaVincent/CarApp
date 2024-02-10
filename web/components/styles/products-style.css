@@ -1,0 +1,39 @@
+.car-products {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(304px, 1fr));
+    justify-content: center;
+    gap: 30px;
+    justify-items: center;
+}
+
+@media screen and (max-width: 1440px) {
+    .car-products {
+        grid-template-columns: repeat(4, minmax(304px, 1fr));
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .car-products {
+        grid-template-columns: repeat(4, 304px);
+        gap: 12px;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .car-products {
+        grid-template-columns: repeat(3, 304px);
+        gap: 20px;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .car-products {
+        grid-template-columns: repeat(2, 304px);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .car-products {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}

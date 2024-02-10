@@ -1,0 +1,73 @@
+.category-container {
+    height: calc(100svh - 140px);
+    position: relative;
+}
+
+.category-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0 10px;
+    overflow-y: auto;
+}
+
+
+.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 40;
+    padding-left: 20px;
+    box-shadow: rgba(0,0,0,0.15) 1.95px 1.95px 2.6px
+}
+
+/* Screens greater than 800px */
+@media screen and (min-width: 768px) {
+    .category-container {
+        height: calc(100svh - 92px);
+    }
+
+    .category-page {
+        width: 100%;
+        height: inherit;
+        display: grid;
+        grid-template-columns: 300px auto;
+        position: sticky;
+        overflow-y: auto;
+        top: 0;
+        left: 0;
+    }
+
+    .menu {
+        position: sticky;
+    }
+}
+
+/* Screen bigge than 1024px */
+@media screen and (min-width: 1024px) {
+    .category-container {
+        height: calc(100svh - 112px);
+    }
+}
+
+
+
+
+/* General styling */
+.category-container::-webkit-scrollbar {
+    width: 8px;
+    /* Adjust the width of the scrollbar for WebKit browsers */
+}
+
+.category-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Color of the scrollbar thumb */
+}
+
+.category-container::-webkit-scrollbar-track {
+    background-color: #ddd;
+    /* Color of the scrollbar track */
+}
