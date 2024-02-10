@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  SELLER
+  ADMIN
+}
+
+model User {
+  id             String      @id @default(uuid())
+  email          String      @unique
+  name           String
+  role           UserRole    @default(CUSTOMER)
+  hashedPassword String
+  address        String      @default("")
+  profileImg     String      @default("")
+  state          String      @default("")
+  region         String      @default("")
+
+  carsOwned      Car[]
+  rentedCars     RentedCar[]
+  }
+
+
+
+
+model CarImage {
+  id     String   @id @default(uuid())
+  images String[]
+  car    Car?
+}
+
+
+model Car {
+  id             String      @id @default(uuid())
+  name           String
+  carType        String
+  steering       String
+  capacity       String
+  gasoline       String
+  amount         String
+  description    String
+  rented         Boolean     @default(false)
+  tag            String?
+  tagDescription String?
+  region         String
+  state          String
+
+  ownerId        String
+  User           User @relation(fields: [ownerId], references: [id])
+  
+  carImage       CarImage   @relation(fields: [carImageId], references: [id], onDelete: Cascade)
+  carImageId     String     @unique
+  
+
+  car    RentedCar?
+}
+
+
+enum ACCPETANCE_STATUS {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
+model RentedCar {
+  id              String @id @default(uuid())
+  paymentStatus   Boolean @default(false)
+  isReturned      Boolean @default(false)
+  isDelivered     Boolean @default(false)
+  status          ACCPETANCE_STATUS @default(PENDING)
+
+  Renter          User   @relation(fields: [renterId], references: [id], onDelete: Cascade)
+  renterId        String
+  
+  RentedCar      Car  @relation(fields: [rentedCarId], references: [id], onDelete: Cascade)
+  rentedCarId    String     @unique  // a car should be rented once
+
+  rentDetail      RentedCarDetails @relation(fields: [rentalDetailId], references: [id], onDelete: Cascade)
+  rentalDetailId  String @unique  
+}
+
+model RentedCarDetails {
+  id              String @id @default(uuid())
+  RentedCar       RentedCar?
+
+  pickupInfo      Json
+  dropOffInfo     Json
+  billingAddress  Json
+  paymentInfo     Json
+}
